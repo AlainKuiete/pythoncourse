@@ -113,7 +113,8 @@ class PandasChain:
     # 5 pts - This method should loop through all committed and uncommitted blocks and display all transactions in them
     def display_chain(self): 
         for block in self.__chain:
-            block.display_transactions(self)
+            block.display_transactions()
+        self.__current_block.display_transactions()
     
     # This method accepts a new transaction and adds it to current block if block is not full. 
     # If block is full, it will delegate the committing and creation of a new current block 
@@ -129,16 +130,18 @@ class PandasChain:
     def __commit_block(self,block): 
         # Add code here
         block.set_status("UNCOMMITTED")
-        block.get_simple_merkle_root()
-        block_hash = hashlib.sha256(str(str(uuid.uuid4())+self.__name+str(dt.datetime.now())).encode('utf-8')).hexdigest()
-        prev_hash = block.__block_hash
+        self.__block_hash = hashlib.sha256()
+        self.__block_hash.update(('{}{}{}{}{}'.format(self.__prev_hash, self.__id, str(
+            dt.datetime.now()), self.seq_id, block.get_simple_merkle_root())).encode('utf-8'))
+        self.__block_hash = self.__block_hash.hexdigest()
+        block.set_block_hash(self.__block_hash)
+        self.__prev_hash = self.__block_hash
         self.__chain.append(block)
         self.seq_id += 1
-        new_block = Block(self.seq_id, prev_hash ) # Create block hash
-        new_block.set_block_hash(block_hash)
-        block = new_block
+        self.__current_block = Block(self.seq_id, self.__prev_hash) # Create block hash
         # Add code here
         print('Block committed')
+
     
     # 10 pts - Display just the metadata of all blocks (committed or uncommitted), one block per line.  
     # You'll display the sequence Id, status, block hash, previous block's hash, merkle hash and total number (count) 
@@ -157,7 +160,12 @@ class PandasChain:
     
     # 10 pts - Returns all of the values (Pandas coins transferred) of all transactions from every block as a single list
     def get_values(self):
-        pass
+        values = []
+        for n in len(self.__chain):
+            values.append(self.__chain[n].get_values())
+        return values
+    
+    
             
 class Block:
     # 5 pts for constructor
@@ -165,7 +173,7 @@ class Block:
         self.__seq_id = seq_id # Set to what's passed in from constructor
         self.__prev_hash = prev_hash # From constructor
         self.__col_names = ['Timestamp','Sender','Receiver','Value','TxHash']
-        self.__transactions = pd.DataFrame(columns = self.__col_names,index = []) # Create a new blank DataFrame with set headers
+        self.__transactions = pd.DataFrame(columns = self.__col_names) # Create a new blank DataFrame with set headers
         self.__status = 'UNCOMMITTED' # Initial status. This will be a string.
         self.__block_hash = None
         self.__merkle_tx_hash = None
@@ -178,10 +186,12 @@ class Block:
     # 10 pts - This is the interface for how transactions are added
     def add_transaction(self,s,r,v): 
         ts = dt.datetime.now() # Get current timestamp 
-        tx_hash = hashlib.sha256(str(str(ts) + s + r + str(v)).encode('utf-8')) # Hash of timestamp, sender, receiver, value
-        new_transaction = pd.DataFrame({'Timestamp':[ts],'Sender':[s],'Receiver':[r],'Value':[v],'TxHash':[tx_hash]}) # Create DataFrame with transaction data (a DataFrame with only 1 row)
+        tx_hash = hashlib.sha256()
+        tx_hash.update(('{}{}{}{}'.format(ts, s, r, v)).encode('utf-8'))
+        tx_hash = tx_hash.hexdigest() # Hash of timestamp, sender, receiver, value
+        new_transaction = pd.DataFrame([{'Timestamp':ts,'Sender':s,'Receiver':r,'Value':v,'TxHash':tx_hash}]) # Create DataFrame with transaction data (a DataFrame with only 1 row)
         # Append to the transactions data
-        self.__transactions.append(new_transaction)
+        self.__transactions = self.__transactions.append(new_transaction)
         
         
     # 10 pts -Print all transactions contained by this block
@@ -190,7 +200,7 @@ class Block:
     
     # 5 pts- Return the number of transactions contained by this block
     def get_size(self): 
-        return self.__transactions.shape[0]
+        return (self.__transactions.shape[0])
     
     # 5 pts - Setter for status - Allow for the change of status (only two statuses exist - COMMITTED or UNCOMMITTED). 
     # There is no need to validate status.
@@ -208,13 +218,15 @@ class Block:
     # hash that string producing a "merkle root" - Note, this is not how merkle tries work but is instructive 
     # and indicative in terms of the intent and purpose of merkle tries
     def get_simple_merkle_root(self):
-        trans_hash = ""
-        for trans in range(self.get_size(self)):
-            trans_hash = trans_hash + str(self.__transactions[trans]['TxHash'])
-        return hashlib.sha256(trans_hash)
+        merkle_str = self.__transactions["TxHash"].sum()
+        merk_root = hashlib.sha256()
+        merk_root.update(('{}'.format(merkle_str)).encode('utf-8'))
+        merk_root = merk_root.hexdigest()
+        self.__merkle_tx_hash = merk_root
+        return self.__merkle_tx_hash 
     
     def get_values(self):
-        pass
+        return self.__transactions.get('Value')
 
 class TestAssignment4(unittest.TestCase):
     def test_chain(self):
