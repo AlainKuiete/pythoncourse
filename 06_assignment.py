@@ -83,7 +83,7 @@ def exercise05(n):
     # The function exercise05() receives an integer n. Return an ndarray filled with zeros of size n x n (n rows, n columns)
 
     # ------ Place code below here \/ \/ \/ ------
-    zeros = np.zeros(n,n)
+    zeros = np.zeros((n,n))
 
 
     # ------ Place code above here /\ /\ /\ ------
@@ -93,7 +93,7 @@ def exercise06(n):
     # The function exercise06() receives an integer n. Return an ndarray filled with ones of size n x n (n rows, n columns)
 
     # ------ Place code below here \/ \/ \/ ------
-    ones = np.ones(n,n)
+    ones = np.ones((n,n))
 
 
 
@@ -124,8 +124,8 @@ def exercise08():
     # ------ Place code below here \/ \/ \/ ------
     filename = "http://samplecsvs.s3.amazonaws.com/Sacramentorealestatetransactions.csv"
     df = pd.read_csv(filename)
-    row_count = df.shape()[0]
-    avg_sq_ft =np.mean(df['sq_ft']) 
+    row_count = len(df.index)
+    avg_sq_ft =np.mean(df['sq__ft']) 
     df_zip_95670 = df[df['zip']==95670]
     df_zip_not_95610 = df[df['zip']!=95610]
     # ------ Place code above here /\ /\ /\ ------
@@ -154,11 +154,11 @@ def exercise09():
     # ------ Place code below here \/ \/ \/ ------
     filename = 'https://api.coindesk.com/v1/bpi/historical/close.json'
     
-    df = {"bpi":{"2019-10-19":7974.0883,"2019-10-20":8242.8633,"2019-10-21":8221.3733,"2019-10-22":8034.545,"2019-10-23":7478.905,"2019-10-24":7435.8467,"2019-10-25":8671.5083,"2019-10-26":9261.9983,"2019-10-27":9555.305,"2019-10-28":9223.2067,"2019-10-29":9437.585,"2019-10-30":9170.285,"2019-10-31":9164.365,"2019-11-01":9265.4317,"2019-11-02":9312.36,"2019-11-03":9211.6,"2019-11-04":9424.185,"2019-11-05":9326.6033,"2019-11-06":9345.69,"2019-11-07":9205.8083,"2019-11-08":8770.3617,"2019-11-09":8813.3567,"2019-11-10":9044.7817,"2019-11-11":8726.36,"2019-11-12":8820.2333,"2019-11-13":8775.1017,"2019-11-14":8639.1833,"2019-11-15":8471.2783,"2019-11-16":8496.6,"2019-11-17":8516.08,"2019-11-18":8191.0667},"disclaimer":"This data was produced from the CoinDesk Bitcoin Price Index. BPI value data returned as USD.","time":{"updated":"Nov 19, 2019 00:03:00 UTC","updatedISO":"2019-11-19T00:03:00+00:00"}}  
-    df = np.DataFrame(df)
-    df = df.drop('time', axis=1)
-    df = df.drop('updated', axis=0)
-    df = df.drop('updatedISO')
+    #df = {"bpi":{"2019-10-19":7974.0883,"2019-10-20":8242.8633,"2019-10-21":8221.3733,"2019-10-22":8034.545,"2019-10-23":7478.905,"2019-10-24":7435.8467,"2019-10-25":8671.5083,"2019-10-26":9261.9983,"2019-10-27":9555.305,"2019-10-28":9223.2067,"2019-10-29":9437.585,"2019-10-30":9170.285,"2019-10-31":9164.365,"2019-11-01":9265.4317,"2019-11-02":9312.36,"2019-11-03":9211.6,"2019-11-04":9424.185,"2019-11-05":9326.6033,"2019-11-06":9345.69,"2019-11-07":9205.8083,"2019-11-08":8770.3617,"2019-11-09":8813.3567,"2019-11-10":9044.7817,"2019-11-11":8726.36,"2019-11-12":8820.2333,"2019-11-13":8775.1017,"2019-11-14":8639.1833,"2019-11-15":8471.2783,"2019-11-16":8496.6,"2019-11-17":8516.08,"2019-11-18":8191.0667},"disclaimer":"This data was produced from the CoinDesk Bitcoin Price Index. BPI value data returned as USD.","time":{"updated":"Nov 19, 2019 00:03:00 UTC","updatedISO":"2019-11-19T00:03:00+00:00"}}  
+    df = {"bpi":{"2019-10-20":8242.8633,"2019-10-21":8221.3733,"2019-10-22":8034.545,"2019-10-23":7478.905,"2019-10-24":7435.8467,"2019-10-25":8671.5083,"2019-10-26":9261.9983,"2019-10-27":9555.305,"2019-10-28":9223.2067,"2019-10-29":9437.585,"2019-10-30":9170.285,"2019-10-31":9164.365,"2019-11-01":9265.4317,"2019-11-02":9312.36,"2019-11-03":9211.6,"2019-11-04":9424.185,"2019-11-05":9326.6033,"2019-11-06":9345.69,"2019-11-07":9205.8083,"2019-11-08":8770.3617,"2019-11-09":8813.3567,"2019-11-10":9044.7817,"2019-11-11":8726.36,"2019-11-12":8820.2333,"2019-11-13":8775.1017,"2019-11-14":8639.1833,"2019-11-15":8471.2783,"2019-11-16":8496.6,"2019-11-17":8516.08,"2019-11-18":8191.0667,"2019-11-19":8136.2767},"disclaimer":"This data was produced from the CoinDesk Bitcoin Price Index. BPI value data returned as USD.","time":{"updated":"Nov 20, 2019 00:03:00 UTC","updatedISO":"2019-11-20T00:03:00+00:00"}}
+    df = pd.DataFrame(df)
+    df = df = df.drop(['disclaimer','time'], axis=1)
+    df = df.drop(['updated','updatedISO'], axis=0)
     # ------ Place code above here /\ /\ /\ ------    
     return df, plotly_url
 
@@ -178,7 +178,7 @@ def exercise11(n):
     '''
     # ------ Place code below here \/ \/ \/ ------
     array_1d =  np.arange(n)
-    array_reshaped = array_1d.reshape(3, n/3)
+    array_reshaped = array_1d.reshape(3, int(n/3))
 
 
 
@@ -229,7 +229,9 @@ def exercise14(words):
     Using Series.map() and lambdas may help.
     '''
     # ------ Place code below here \/ \/ \/ ------
-    df = pd.Series.map(len, words)
+    df = []
+    for word in words:
+        df.append(len(word))
    
 
     # ------ Place code above here /\ /\ /\ ------ 
@@ -242,7 +244,9 @@ def exercise15():
     and just the street address and zip code columns. This can be done with one line of code.
     '''
     # ------ Place code below here \/ \/ \/ ------
-    df = pd.DataFrame(exercise08()[0].iloc[5,['street','zip']])
+    df = exercise08()[0]
+    df = df[['street','zip']]
+    df = df.iloc[4]
 
 
     # ------ Place code above here /\ /\ /\ ------ 
